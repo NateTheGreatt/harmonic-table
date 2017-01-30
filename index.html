@@ -15,12 +15,12 @@ var Hexagon = function(side,offsetX,offsetY) {
   var a = c * (1/2);
   var b = Math.sin(90) * c;
 
-  var pt1 = [0,a+c];
-  var pt2 = [0,a];
-  var pt3 = [b,0];
-  var pt4 = [2*b,a];
-  var pt5 = [2*b,a+c];
-  var pt6 = [b,2*c];
+  var pt1 = [0,b];
+  var pt2 = [a,0];
+  var pt3 = [a+c,0];
+  var pt4 = [2*c,b];
+  var pt5 = [a+c,2*b];
+  var pt6 = [a,2*b];
 
   var points = [];
 
@@ -42,10 +42,12 @@ var Hexagon = function(side,offsetX,offsetY) {
   points.push(new PIXI.Point(offsetX+pt6[0],offsetY+pt6[1]));
   points.push(new PIXI.Point(offsetX+pt1[0],offsetY+pt1[1]));
 
-  return new PIXI.Graphics()
+  var gfx = new PIXI.Graphics()
     .beginFill(0xFFFFFF, 1)
-    .lineStyle(1, 0x000000, 1)
+    // .lineStyle(1, 0x000000, 1)
     .drawPolygon(points);
+
+  return gfx;
 }
 
 var HexButton = function(label,frequency) {
@@ -70,7 +72,7 @@ var HexButton = function(label,frequency) {
   oscillator.start();
 
   this.graphic.on('pointerdown', function() {
-    gainNode.gain.linearRampToValueAtTime(1, audioCtx.currentTime + 0.02);
+    gainNode.gain.linearRampToValueAtTime(0.5, audioCtx.currentTime + 0.02);
     gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 1);
   });
 
@@ -82,36 +84,45 @@ function absFreq(desiredKey) {
   return tuning * Math.pow(temperment, desiredKey-49);
 }
 
-console.log(absFreq(40));
-
 var app = new PIXI.Application(800,600, { backgroundColor: 0x1099bb });
 document.body.appendChild(app.view);
 
+var keyMap = ['A','A#','B','C','C#','D','D#','E','F','F#','G','G#'];
+
 var btns = [];
 
-btns.push(new HexButton('A',440));
-btns.push(new HexButton('G#',415.3));
-btns.push(new HexButton('G',392));
-btns.push(new HexButton('F#',369.99));
-btns.push(new HexButton('F',349.23));
-btns.push(new HexButton('E',329.63));
-btns.push(new HexButton('D#',311.13));
-btns.push(new HexButton('D',293.66));
-btns.push(new HexButton('C#',277.18));
-btns.push(new HexButton('C',261.63));
-btns.push(new HexButton('B',246.94));
-btns.push(new HexButton('A#',233.08));
-btns.push(new HexButton('A',220));
+var x = 50;
+var y = 500;
+var cols = 7;
+var hSpacing = 66;
 
-btns.reverse();
-
-var x = 0;
-
-btns.forEach(function(btn) {
+for(var i = 1; i <= 56; i++) {
+  var btn = new HexButton(keyMap[i%12],absFreq(i))
   btn.graphic.x = x;
-  x+=50;
+  btn.graphic.y = y;
   app.stage.addChild(btn.graphic);
-})
+
+  if(i%cols==0) {
+    x = 50;
+    y -= 37;
+  } else x+=hSpacing;
+}
+
+x = 17;
+y = 482;
+
+for(var i = 1; i <= 56; i++) {
+  var btn = new HexButton(keyMap[(i+3)%12],absFreq(i+3))
+  btn.graphic.x = x;
+  btn.graphic.y = y;
+  app.stage.addChild(btn.graphic);
+
+  if(i%cols==0) {
+    x = 17;
+    y -= 37;
+  } else x+=hSpacing;
+}
+
 
 </script>
 
