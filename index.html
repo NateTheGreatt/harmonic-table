@@ -55,6 +55,14 @@ var Hexagon = function(side,offsetX,offsetY) {
   return gfx;
 }
 
+var mouseDown = false;
+document.addEventListener("mousedown", function() {
+  mouseDown = true;
+});
+document.addEventListener("mouseup", function() {
+  mouseDown = false;
+});
+
 var HexButton = function(label,frequency) {
   this.graphic = new Hexagon(20,0,0);
   this.graphic.interactive = true;
@@ -75,10 +83,24 @@ var HexButton = function(label,frequency) {
   gainNode.gain.value = 0;
 
   oscillator.start();
+  
+  this.play = function() {
+    gainNode.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + a);
+    gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + a + r);
+  }
+
+  var a = 0.02;
+  var r = 0.5;
+  var self = this;
 
   this.graphic.on('pointerdown', function() {
-    gainNode.gain.linearRampToValueAtTime(0.5, audioCtx.currentTime + 0.02);
-    gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 1);
+    self.play();
+  });
+
+  this.graphic.on('pointerover', function() {
+    if(mouseDown) {
+      self.play();
+    }
   });
 
 }
