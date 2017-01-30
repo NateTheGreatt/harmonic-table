@@ -1,0 +1,118 @@
+<html>
+
+<head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.3.4/pixi.min.js"></script>
+</head>
+
+<body>
+
+<script>
+
+var audioCtx = new AudioContext();
+
+var Hexagon = function(side,offsetX,offsetY) {
+  var c = side;
+  var a = c * (1/2);
+  var b = Math.sin(90) * c;
+
+  var pt1 = [0,a+c];
+  var pt2 = [0,a];
+  var pt3 = [b,0];
+  var pt4 = [2*b,a];
+  var pt5 = [2*b,a+c];
+  var pt6 = [b,2*c];
+
+  var points = [];
+
+  points.push(new PIXI.Point(offsetX+pt1[0],offsetY+pt1[1]));
+  points.push(new PIXI.Point(offsetX+pt2[0],offsetY+pt2[1]));
+
+  points.push(new PIXI.Point(offsetX+pt2[0],offsetY+pt2[1]));
+  points.push(new PIXI.Point(offsetX+pt3[0],offsetY+pt3[1]));
+
+  points.push(new PIXI.Point(offsetX+pt3[0],offsetY+pt3[1]));
+  points.push(new PIXI.Point(offsetX+pt4[0],offsetY+pt4[1]));
+
+  points.push(new PIXI.Point(offsetX+pt4[0],offsetY+pt4[1]));
+  points.push(new PIXI.Point(offsetX+pt5[0],offsetY+pt5[1]));
+
+  points.push(new PIXI.Point(offsetX+pt5[0],offsetY+pt5[1]));
+  points.push(new PIXI.Point(offsetX+pt6[0],offsetY+pt6[1]));
+
+  points.push(new PIXI.Point(offsetX+pt6[0],offsetY+pt6[1]));
+  points.push(new PIXI.Point(offsetX+pt1[0],offsetY+pt1[1]));
+
+  return new PIXI.Graphics()
+    .beginFill(0xFFFFFF, 1)
+    .lineStyle(1, 0x000000, 1)
+    .drawPolygon(points);
+}
+
+var HexButton = function(label,frequency) {
+  this.graphic = new Hexagon(20,0,0);
+  this.graphic.interactive = true;
+  this.graphic.buttonMode = true;
+
+  var txt = new PIXI.Text(label);
+  txt.style = {fontSize:11}
+  txt.x = 14;
+  txt.y = 14;
+
+  this.graphic.addChild(txt);
+
+  var oscillator = audioCtx.createOscillator();
+  oscillator.frequency.value = frequency;
+  var gainNode = audioCtx.createGain();
+  oscillator.connect(gainNode);
+  gainNode.connect(audioCtx.destination);
+  gainNode.gain.value = 0;
+
+  oscillator.start();
+
+  this.graphic.on('pointerdown', function() {
+    gainNode.gain.linearRampToValueAtTime(1, audioCtx.currentTime + 0.02);
+    gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 1);
+  });
+
+}
+
+function absFreq(desiredKey) {
+  var tuning = 440; // A = 440Hz
+  var temperment = Math.pow(2, 1/12); // 12-tone
+  return tuning * Math.pow(temperment, desiredKey-49);
+}
+
+console.log(absFreq(40));
+
+var app = new PIXI.Application(800,600, { backgroundColor: 0x1099bb });
+document.body.appendChild(app.view);
+
+var btns = [];
+
+btns.push(new HexButton('A',440));
+btns.push(new HexButton('G#',415.3));
+btns.push(new HexButton('G',392));
+btns.push(new HexButton('F#',369.99));
+btns.push(new HexButton('F',349.23));
+btns.push(new HexButton('E',329.63));
+btns.push(new HexButton('D#',311.13));
+btns.push(new HexButton('D',293.66));
+btns.push(new HexButton('C#',277.18));
+btns.push(new HexButton('C',261.63));
+btns.push(new HexButton('B',246.94));
+btns.push(new HexButton('A#',233.08));
+btns.push(new HexButton('A',220));
+
+btns.reverse();
+
+var x = 0;
+
+btns.forEach(function(btn) {
+  btn.graphic.x = x;
+  x+=50;
+  app.stage.addChild(btn.graphic);
+})
+
+</script>
+
+</body>
