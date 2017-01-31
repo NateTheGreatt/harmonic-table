@@ -83,7 +83,7 @@ var HexButton = function(label,frequency) {
   gainNode.gain.value = 0;
 
   oscillator.start();
-  
+
   this.play = function() {
     gainNode.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + a);
     gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + a + r);
@@ -124,7 +124,7 @@ var cols = 7;
 var hSpacing = 66;
 
 for(var i = 1; i <= 56; i++) {
-  var btn = new HexButton(keyMap[i%12],absFreq(i))
+  var btn = new HexButton(keyMap[i%12],absFreq(i+1))
   btn.graphic.x = x;
   btn.graphic.y = y;
   app.stage.addChild(btn.graphic);
@@ -139,7 +139,7 @@ x = 17;
 y = 482;
 
 for(var i = 1; i <= 56; i++) {
-  var btn = new HexButton(keyMap[(i+3)%12],absFreq(i+3))
+  var btn = new HexButton(keyMap[(i+3)%12],absFreq(i+4))
   btn.graphic.x = x;
   btn.graphic.y = y;
   app.stage.addChild(btn.graphic);
